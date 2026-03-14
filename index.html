@@ -12,49 +12,47 @@ body{
     background:#0f172a;
     color:white;
     font-family:Arial;
-    text-align:center;
 }
 
 .container{
-    width:900px;
-    margin:auto;
-}
-
-/* modal overlay */
-
-#modal{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.7);
+    display:flex;
     justify-content:center;
     align-items:center;
+    height:100vh;
+    gap:60px;
 }
 
-/* modal window */
+/* chart */
 
-#modalContent{
-    background:#1e293b;
-    padding:30px;
-    border-radius:10px;
+#chartBox{
     width:500px;
+}
+
+/* skill popup */
+
+#skillsPopup{
+
+    width:350px;
+    min-height:200px;
+
+    background:#1e293b;
+    border-radius:10px;
+
+    padding:20px;
+
+    transition:opacity 0.2s;
 }
 
 .skill{
     display:inline-block;
+    background:#334155;
     padding:6px 10px;
     margin:5px;
-    background:#334155;
     border-radius:6px;
 }
 
-.close{
-    float:right;
-    cursor:pointer;
-    font-size:20px;
+.hidden{
+    opacity:0.2;
 }
 
 </style>
@@ -64,31 +62,19 @@ body{
 
 <div class="container">
 
-<h1>ML Engineer Skill Distribution</h1>
-
+<div id="chartBox">
 <canvas id="pieChart"></canvas>
-
-<canvas id="radarChart"></canvas>
-
 </div>
 
+<div id="skillsPopup" class="hidden">
 
-<!-- modal -->
+<h3 id="popupTitle">Hover category</h3>
 
-<div id="modal">
-
-<div id="modalContent">
-
-<span class="close" onclick="closeModal()">×</span>
-
-<h2 id="modalTitle"></h2>
-
-<div id="modalSkills"></div>
+<div id="popupSkills"></div>
 
 </div>
 
 </div>
-
 
 <script>
 
@@ -162,19 +148,19 @@ const skills = {
 }
 
 const labels = Object.keys(skills)
-const counts = labels.map(l => skills[l].length)
+const counts = labels.map(x=>skills[x].length)
 
 
 
-function openModal(category){
+function showSkills(category){
 
-document.getElementById("modal").style.display="flex"
+const title=document.getElementById("popupTitle")
+const div=document.getElementById("popupSkills")
+const box=document.getElementById("skillsPopup")
 
-document.getElementById("modalTitle").innerText=category
+title.innerText=category
 
-const skillsDiv=document.getElementById("modalSkills")
-
-skillsDiv.innerHTML=""
+div.innerHTML=""
 
 skills[category].forEach(skill=>{
 
@@ -182,21 +168,29 @@ const span=document.createElement("span")
 span.className="skill"
 span.innerText=skill
 
-skillsDiv.appendChild(span)
+div.appendChild(span)
 
 })
 
-}
-
-
-function closeModal(){
-
-document.getElementById("modal").style.display="none"
+box.classList.remove("hidden")
 
 }
 
 
-/* PIE CHART */
+
+function clearSkills(){
+
+const title=document.getElementById("popupTitle")
+const div=document.getElementById("popupSkills")
+const box=document.getElementById("skillsPopup")
+
+title.innerText="Hover category"
+div.innerHTML=""
+box.classList.add("hidden")
+
+}
+
+
 
 new Chart(document.getElementById("pieChart"),{
 
@@ -204,71 +198,37 @@ type:"pie",
 
 data:{
 labels:labels,
-datasets:[{data:counts}]
+datasets:[{
+data:counts
+}]
 },
 
 options:{
 
-animation:{
-duration:1500
-},
-
-onClick:(event,elements)=>{
+onHover:(event,elements)=>{
 
 if(elements.length){
 
 const index=elements[0].index
 const category=labels[index]
 
-openModal(category)
+showSkills(category)
+
+}else{
+
+clearSkills()
 
 }
 
-}
-
-}
-
-})
-
-
-/* RADAR CHART */
-
-new Chart(document.getElementById("radarChart"),{
-
-type:"radar",
-
-data:{
-labels:labels,
-datasets:[{
-label:"Skill Coverage",
-data:counts,
-fill:true
-}]
 },
 
-options:{
-animation:{duration:2000},
-scales:{
-r:{beginAtZero:true}
+plugins:{
+tooltip:{enabled:false}
 }
+
 }
 
 })
-
-
-/* close modal if clicking outside */
-
-window.onclick=function(event){
-
-const modal=document.getElementById("modal")
-
-if(event.target==modal){
-
-closeModal()
-
-}
-
-}
 
 </script>
 
