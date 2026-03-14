@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ML Engineer Skill Map</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+    background:#0f172a;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+.container{
+    width:900px;
+    margin:auto;
+}
+
+canvas{
+    margin-top:30px;
+}
+
+#skillList{
+    margin-top:30px;
+    padding:20px;
+    background:#1e293b;
+    border-radius:10px;
+}
+
+.skill{
+    display:inline-block;
+    padding:6px 10px;
+    margin:5px;
+    background:#334155;
+    border-radius:6px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>ML Engineer Skill Distribution</h1>
+
+<canvas id="pieChart"></canvas>
+
+<canvas id="radarChart"></canvas>
+
+<div id="skillList">
+Click a category in the pie chart to see skills
+</div>
+
+</div>
+
+<script>
+
+const skills = {
+
+"Machine Learning":[
+"scikit-learn",
+"xgboost",
+"lightgbm",
+"statsmodels",
+"optuna"
+],
+
+"Deep Learning":[
+"PyTorch",
+"PyTorch Lightning",
+"ONNX",
+"tflite",
+"OpenCV",
+"Ultralytics YOLO",
+"mediapipe",
+"transformers",
+"faiss",
+"LangChain"
+],
+
+"Data Science":[
+"numpy",
+"pandas",
+"GeoPandas",
+"matplotlib",
+"seaborn"
+],
+
+"MLOps":[
+"MLflow",
+"DagsHub",
+"Azure",
+"AWS Lambda",
+"AWS S3",
+"Docker",
+"Kubernetes",
+"RabbitMQ",
+"FastAPI",
+"Jenkins",
+"Github Actions",
+"Evidently",
+"Apache Airflow"
+],
+
+"Databases":[
+"MySQL",
+"PostgreSQL",
+"MongoDB",
+"SQLite"
+],
+
+"Programming":[
+"Python",
+"C++"
+],
+
+"Engineering":[
+"Linux",
+"Git",
+"System Design",
+"Project Management",
+"JupyterLab"
+]
+
+}
+
+
+const labels = Object.keys(skills)
+const counts = labels.map(l => skills[l].length)
+
+
+
+function showSkills(category){
+
+const list = document.getElementById("skillList")
+
+let html = "<h3>"+category+"</h3>"
+
+skills[category].forEach(skill=>{
+html += `<span class="skill">${skill}</span>`
+})
+
+list.innerHTML = html
+
+}
+
+
+
+const pie = new Chart(document.getElementById("pieChart"),{
+
+type:"pie",
+
+data:{
+labels:labels,
+datasets:[{
+data:counts
+}]
+},
+
+options:{
+animation:{
+animateRotate:true,
+duration:1500
+},
+
+onClick:(event, elements)=>{
+
+if(elements.length > 0){
+
+const index = elements[0].index
+const category = labels[index]
+
+showSkills(category)
+
+}
+
+}
+
+}
+
+})
+
+
+
+const radar = new Chart(document.getElementById("radarChart"),{
+
+type:"radar",
+
+data:{
+labels:labels,
+
+datasets:[{
+
+label:"Skill Coverage",
+
+data:counts,
+
+fill:true
+
+}]
+
+},
+
+options:{
+scales:{
+r:{
+beginAtZero:true,
+ticks:{display:false},
+grid:{color:"gray"}
+}
+},
+
+animation:{
+duration:2000
+}
+
+}
+
+})
+
+</script>
+
+</body>
+</html>
