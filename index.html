@@ -20,15 +20,27 @@ body{
     margin:auto;
 }
 
-canvas{
-    margin-top:30px;
+/* modal overlay */
+
+#modal{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.7);
+    justify-content:center;
+    align-items:center;
 }
 
-#skillList{
-    margin-top:30px;
-    padding:20px;
+/* modal window */
+
+#modalContent{
     background:#1e293b;
+    padding:30px;
     border-radius:10px;
+    width:500px;
 }
 
 .skill{
@@ -37,6 +49,12 @@ canvas{
     margin:5px;
     background:#334155;
     border-radius:6px;
+}
+
+.close{
+    float:right;
+    cursor:pointer;
+    font-size:20px;
 }
 
 </style>
@@ -52,11 +70,25 @@ canvas{
 
 <canvas id="radarChart"></canvas>
 
-<div id="skillList">
-Click a category in the pie chart to see skills
+</div>
+
+
+<!-- modal -->
+
+<div id="modal">
+
+<div id="modalContent">
+
+<span class="close" onclick="closeModal()">×</span>
+
+<h2 id="modalTitle"></h2>
+
+<div id="modalSkills"></div>
+
 </div>
 
 </div>
+
 
 <script>
 
@@ -129,53 +161,66 @@ const skills = {
 
 }
 
-
 const labels = Object.keys(skills)
 const counts = labels.map(l => skills[l].length)
 
 
 
-function showSkills(category){
+function openModal(category){
 
-const list = document.getElementById("skillList")
+document.getElementById("modal").style.display="flex"
 
-let html = "<h3>"+category+"</h3>"
+document.getElementById("modalTitle").innerText=category
+
+const skillsDiv=document.getElementById("modalSkills")
+
+skillsDiv.innerHTML=""
 
 skills[category].forEach(skill=>{
-html += `<span class="skill">${skill}</span>`
-})
 
-list.innerHTML = html
+const span=document.createElement("span")
+span.className="skill"
+span.innerText=skill
+
+skillsDiv.appendChild(span)
+
+})
 
 }
 
 
+function closeModal(){
 
-const pie = new Chart(document.getElementById("pieChart"),{
+document.getElementById("modal").style.display="none"
+
+}
+
+
+/* PIE CHART */
+
+new Chart(document.getElementById("pieChart"),{
 
 type:"pie",
 
 data:{
 labels:labels,
-datasets:[{
-data:counts
-}]
+datasets:[{data:counts}]
 },
 
 options:{
+
 animation:{
-animateRotate:true,
 duration:1500
 },
 
-onClick:(event, elements)=>{
+onClick:(event,elements)=>{
 
-if(elements.length > 0){
+if(elements.length){
 
-const index = elements[0].index
-const category = labels[index]
+const index=elements[0].index
+const category=labels[index]
 
-showSkills(category)
+openModal(category)
 
 }
 
@@ -186,42 +231,44 @@ showSkills(category)
 })
 
 
+/* RADAR CHART */
 
-const radar = new Chart(document.getElementById("radarChart"),{
+new Chart(document.getElementById("radarChart"),{
 
 type:"radar",
 
 data:{
 labels:labels,
-
 datasets:[{
-
 label:"Skill Coverage",
-
 data:counts,
-
 fill:true
-
 }]
-
 },
 
 options:{
+animation:{duration:2000},
 scales:{
-r:{
-beginAtZero:true,
-ticks:{display:false},
-grid:{color:"gray"}
+r:{beginAtZero:true}
 }
-},
-
-animation:{
-duration:2000
-}
-
 }
 
 })
+
+
+/* close modal if clicking outside */
+
+window.onclick=function(event){
+
+const modal=document.getElementById("modal")
+
+if(event.target==modal){
+
+closeModal()
+
+}
+
+}
 
 </script>
 
